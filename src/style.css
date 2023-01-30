@@ -21,6 +21,10 @@ li {
   list-style: none;
 }
 
+.shadow {
+  box-shadow: 0px 10px 20px 0 rgba(0,0,0,0.2) ;
+}
+
 * {
   padding: 0%;
   margin: 0%;
@@ -52,6 +56,10 @@ body::-webkit-scrollbar-thumb {
   :root {
     color: #f6f6f6;
     background-color: rgb(40,44,52);
+  }
+
+  .shadow {
+    box-shadow: 0px 10px 20px 0 rgba(119, 113, 113, 0.2) ;
   }
 
   a:hover {

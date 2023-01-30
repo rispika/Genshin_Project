@@ -6,16 +6,48 @@ mod utils;
 use crate::utils::{get_gacha_url_impl, set_window_shadow};
 mod data;
 use data::{Data, DataApp, DataCount};
-use std::sync::Mutex;
+use std::{fs, sync::Mutex};
 use substring::Substring;
 use tauri::State;
+use utils::{read_genshin_path, save_genshin_path_impl};
 struct AppState {
     app: Mutex<DataApp>,
 }
 
+//保存原神路径
+#[tauri::command]
+async fn save_genshin_path() -> Result<(), String> {
+    save_genshin_path_impl()?;
+    Ok(())
+}
+
+#[tauri::command]
+//检查原神路径
+async fn check_genshin_path() -> Result<(), String> {
+    let genshin_path = read_genshin_path()?;
+    let paths = fs::read_dir(genshin_path).map_err(|err| err.to_string())?;
+    let mut flag = true;
+    for path in paths {
+        let g_path = path.unwrap().path().to_str().unwrap().to_string();
+        println!("{}",g_path);
+        if g_path.contains("YuanShen.exe")
+        {
+            flag = false;
+            break;
+        }   
+    }
+    if flag {
+        //没找到
+        return Err("没有获取正确的原神路径!".to_string())
+    }
+    Ok(())
+}
+
+//获取卡池地址
 #[tauri::command(async)]
 fn get_gacha_url() -> Result<String, String> {
-    let url = get_gacha_url_impl()?;
+    let genshin_path = read_genshin_path()?;
+    let url = get_gacha_url_impl(genshin_path)?;
     Ok(url)
 }
 
@@ -101,9 +133,9 @@ fn get_gacha_time(mut gacha_type: String, state: State<AppState>) -> Result<Stri
     }
     for data in query.iter() {
         if count {
-            start_time = data.time.substring(0,9);
+            start_time = data.time.substring(0, 9);
         } else {
-            end_time = data.time.substring(0,9);
+            end_time = data.time.substring(0, 9);
         }
         count = false;
     }
@@ -127,7 +159,9 @@ fn main() {
             get_count_rank_list,
             get_data_uid,
             get_gacha_url,
-            get_gacha_time
+            get_gacha_time,
+            save_genshin_path,
+            check_genshin_path
         ])
         .manage(AppState {
             app: Mutex::from(app),

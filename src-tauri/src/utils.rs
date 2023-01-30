@@ -2,7 +2,7 @@
 use regex::Regex;
 use std::{
     fs::{self, File},
-    io::Read,
+    io::{Read, Write},
     path::Path,
 };
 use tauri::{api::path, Manager, Runtime};
@@ -12,8 +12,19 @@ pub fn set_window_shadow<R: Runtime>(app: &tauri::App<R>) {
 
     set_shadow(&window, true).expect("Unsupported platform!");
 }
+//获取用户资源路径
+pub fn get_project_data_path() -> String {
+    let data_path = path::local_data_dir()
+        .unwrap()
+        .into_os_string()
+        .into_string()
+        .unwrap()
+        + "\\genshin_project";
+    data_path
+}
+
 //保存原神游戏路径
-pub fn save_genshin_path() -> Result<(), String> {
+pub fn save_genshin_path_impl() -> Result<(), String> {
     let genshin_output = path::home_dir()
         .unwrap()
         .into_os_string()
@@ -34,43 +45,41 @@ pub fn save_genshin_path() -> Result<(), String> {
         .read_to_string(&mut output_context)
         .map_err(|err| err.to_string())?;
     //正则
-    let re1 = Regex::new(r"Warmup file (.+?)/StreamingAssets").map_err(|err| err.to_string())?;
+    let re1 = Regex::new(r"Warmup file (.+?)/YuanShen_Data").map_err(|err| err.to_string())?;
     let mut genshin_path = String::new();
     for cap in re1.captures_iter(&output_context) {
         genshin_path = String::from(&cap[1]);
         break;
     }
     println!("genshin_path:{}", genshin_path);
+    //获取项目路径
+    let project_path = get_project_data_path();
+    let mut log_file = File::create(project_path + "\\path_log.txt").map_err(|err| err.to_string())?;
+    log_file.write(genshin_path.as_bytes()).map_err(|err| err.to_string())?;
     Ok(())
 }
 //读取原神游戏路径
 pub fn read_genshin_path() -> Result<String, String> {
-    let data_path = path::local_data_dir()
-        .unwrap()
-        .into_os_string()
-        .into_string()
-        .unwrap()
-        + "\\genshin_project";
+    let data_path = get_project_data_path();
     if Path::new(&data_path).exists() == false {
         fs::create_dir(&data_path).expect("该路径未找到!");
     }
     let genshin_log_path_str = data_path + "\\path_log.txt";
     let genshin_log_path = Path::new(&genshin_log_path_str[..]);
     if !genshin_log_path.exists() {
-        save_genshin_path();
+        save_genshin_path_impl()?;
     }
-    let genshin_path_file = File::open(genshin_log_path_str).map_err(|err| err.to_string())?;
+    let mut genshin_path_file = File::open(genshin_log_path_str).map_err(|err| err.to_string())?;
     let mut genshin_path_buf = String::new();
-    genshin_path_file.read_to_string(&mut genshin_path_buf);
+    genshin_path_file.read_to_string(&mut genshin_path_buf).map_err(|err| err.to_string())?;
     Ok(genshin_path_buf)
 }
-
 // 获取卡池地址
 pub fn get_gacha_url_impl(genshin_path: String) -> Result<String, String> {
     if genshin_path.is_empty() {
         return Ok("".to_string());
     }
-    let log_path = genshin_path + "/webCaches/Cache/Cache_Data/data_2";
+    let log_path = genshin_path + "/YuanShen_Data/webCaches/Cache/Cache_Data/data_2";
     let mut input = File::open(log_path).expect("file open wrong");
     // 转换成utf8
     let mut buf = vec![];

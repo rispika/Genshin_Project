@@ -9,7 +9,8 @@ export default createStore({
         flagLoading: false,
         loadingMargin: 0,
         loadingMsg: '请稍等一会!',
-        UID: 'NONE'
+        UID: 'NONE',
+        noticeInitFlag: false
     },
     actions: {
         async updateUID() {
@@ -34,6 +35,9 @@ export default createStore({
         },
         setFlagLoading(state, newFlag) {
             state.flagLoading = newFlag
+        },
+        setNoticeInitFlag(state, newFlag) {
+            state.noticeInitFlag = newFlag
         }
     }
 })

@@ -12,22 +12,54 @@
       </Transition>
     </div>
     <span class="uid">UID:{{ store.state.UID }}</span>
+    <button class="theme_btn" @click="changeTheme">
+      <Transition name="sun">
+        <i v-if="theme_bool" class="iconfont icon-lieri theme_item"></i>
+      </Transition>
+      <Transition name="moon">
+        <i v-if="!theme_bool" class="iconfont icon-yejing theme_item"></i>
+      </Transition>
+    </button>
     <Loading></Loading>
+    <Notice @restart="initProject"></Notice>
   </div>
 </template>
 
 <script setup>
+import Notice from './components/Notice-init.vue'
 import Loading from './components/Loading.vue'
 import Header from './components/Header.vue';
 import Nav from './components/Nav.vue';
-import { onMounted } from 'vue';
+import { currentMonitor } from '@tauri-apps/api/window';
+import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
+import { invoke } from '@tauri-apps/api';
+import { appWindow } from '@tauri-apps/api/window';
 const store = useStore()
+const theme_bool = ref(null);
+const monitor = await currentMonitor();
+console.log(`monitor=${monitor}`);
 onMounted(async () => {
-  store.dispatch('updateUID')
-  store.commit('setFlagLoading',true)
-  console.log(`当前loading-flag = ${store.state.flagLoading}`);
+  store.commit('setFlagLoading', true)
+  initProject()
+  theme_bool.value = await appWindow.theme() === 'light'
 })
+const changeTheme = () => {
+  theme_bool.value = !theme_bool.value
+  
+}
+async function initProject() {
+  store.dispatch('updateUID')
+  try {
+    await invoke('check_genshin_path')
+    store.commit('setFlagLoading', false)
+
+  } catch (err) {
+    console.log(`check_genshin_path 发生错误:${err}`);
+    store.commit('setNoticeInitFlag', true)
+  }
+
+}
 </script>
 
 <style scoped>
@@ -56,10 +88,31 @@ onMounted(async () => {
   flex: 1;
 }
 
+.theme_btn {
+  position: fixed;
+  right: 5%;
+  top: 10%;
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  backdrop-filter: blur(5px);
+  transition: all .5s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.theme_item {
+  position: absolute;
+  font-size: 35px;
+}
+
 .v-enter-active,
 .v-leave-active {
   transition: all .5s ease;
 }
+
 .v-enter-from,
 .v-leave-to {
   opacity: 0;

@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-        <img src="../assets/img/klee.jpg" alt="囊哒哟!">
+        <img class="shadow" src="../assets/img/klee.jpg" alt="囊哒哟!">
         <h1>欢迎使用Genshin Project Tools!</h1>
     </div>
 </template>

@@ -1,29 +1,29 @@
 <template>
-    <div class="nav" :class="[{ long_nav: flag_arrow }]">
+    <div class="nav shadow" :class="[{ long_nav: flag_arrow }]">
         <div class="nav_fix" :class="[{ long_nav: flag_arrow }]">
-            <button @click="clickArrow">
-                <i :class="[{ i_click: flag_arrow }]" class="fa fa-chevron-down" aria-hidden="true"></i>
+            <button @click="clickArrow" >
+                <i :class="[{ i_click: flag_arrow }]" class="iconfont icon-xiangxia arrow"></i>
             </button>
             <router-link tag="button" class="link" to="/">
-                <i class="fa fa-university" aria-hidden="true"></i>
+                <i class="iconfont icon-zhuye" aria-hidden="true"></i>
                 <transition>
                     <span v-show="flag_arrow">主页</span>
                 </transition>
             </router-link>
             <router-link tag="button" class="link" to="/card">
-                <i class="fa fa-database" aria-hidden="true"></i>
+                <i class="iconfont icon-bingtu" aria-hidden="true"></i>
                 <Transition>
                     <span v-show="flag_arrow">抽卡分析</span>
                 </Transition>
             </router-link>
             <router-link tag="button" class="link" to="/t1">
-                <i class="fa fa-cubes" aria-hidden="true"></i>
+                <i class="iconfont icon-shujuwajue" aria-hidden="true"></i>
                 <Transition>
                     <span v-show="flag_arrow">还没做捏</span>
                 </Transition>
             </router-link>
             <router-link tag="button" class="link" to="/t2">
-                <i class="fa fa-share" aria-hidden="true"></i>
+                <i class="iconfont icon-qiapianxingshi" aria-hidden="true"></i>
                 <Transition>
                     <span v-show="flag_arrow">嗨害害!</span>
                 </Transition>
@@ -74,6 +74,9 @@ const clickArrow = () => {
     will-change: width;
     z-index: 10;
 }
+.iconfont {
+    font-size: 20px;
+}
 
 .nav span {
     font-weight: 600;
@@ -107,14 +110,13 @@ const clickArrow = () => {
 div .long_nav {
     width: 150px;
 }
-
-.fa-chevron-down {
-    font-size: 20px;
+.arrow {
+    display: inline-block;
     transition: all .5s ease;
 }
 
 .i_click {
-    transform: rotateZ(-90deg);
+    transform: rotateZ(-90deg) !important;
 }
 
 .split {

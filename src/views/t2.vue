@@ -1,6 +1,6 @@
 <template>
     <div class="box">
-        <img src="../assets/img/venti.jpg" alt="囊哒哟!">
+        <img class="shadow" src="../assets/img/venti.jpg" alt="囊哒哟!">
         <h1>诶嘿!还没做捏!诶嘿!</h1>
     </div>
 </template>

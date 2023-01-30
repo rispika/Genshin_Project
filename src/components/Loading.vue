@@ -1,5 +1,5 @@
 <template>
-    <div class="loading"  :style="{ width: 'calc(100% - ' + store.state.loadingMargin + 'px)' }">
+    <div v-if="store.state.flagLoading" class="loading"  :style="{ width: 'calc(100% - ' + store.state.loadingMargin + 'px)' }">
         <div class="out_box">
             <span></span>
             <span></span>
@@ -79,7 +79,7 @@ const poetry = ref([
 }
 .loading {
     position: fixed;
-    z-index: 999;
+    z-index: 99;
     right: 0%;
     top: 35px;
     height: calc(100% - 35px);
@@ -98,6 +98,7 @@ const poetry = ref([
     position: relative;
     height: 150px;
     width: 150px;
+    box-shadow: 0;
 }
 
 .out_box span {
@@ -105,6 +106,7 @@ const poetry = ref([
     height: 100%;
     width: 100%;
     animation: loading 3.5s linear infinite;
+    box-shadow: 0;
 }
 
 span::before {
@@ -176,6 +178,9 @@ span:nth-child(5) {
 
     span::before {
         background-color: #fff;
+    }
+    *{
+        color: #fff;
     }
 }
 </style>

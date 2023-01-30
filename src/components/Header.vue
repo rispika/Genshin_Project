@@ -1,5 +1,5 @@
 <template>
-    <div id="header" data-tauri-drag-region>
+    <div class="shadow" id="header" data-tauri-drag-region>
         <img src="../assets/img/paimeng64.ico" alt="">
         <span class="label" data-tauri-drag-region>Genshin Project</span>
         <button @click="appWindow.minimize()" class="btn" style="background-color: #0c8918"></button>

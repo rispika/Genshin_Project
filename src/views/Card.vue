@@ -1,6 +1,6 @@
 <template>
     <div class="card">
-        <div class="card_box">
+        <div class="card_box shadow">
             <div id="chart301" class="echart_box"></div>
             <span class="all_count">共{{ count301 }}抽</span>
             <span class="time_count">{{ dataRange301 }}</span>
@@ -12,13 +12,13 @@
                     <span :style="{ width: v.count * 0.7 + '%' }"
                         :class="{ bg_yes: v.count < 63, bg_no: v.count >= 63 }">{{
                             v.count
-                                < 63 ? '欧' : '非'
+                                <= 63 ? '欧' : '非'
                         }}</span>
                             {{ v.count }}抽
                 </div>
             </div>
         </div>
-        <div class="card_box">
+        <div class="card_box shadow">
             <div id="chart302" class="echart_box"></div>
             <span class="all_count">共{{ count302 }}抽</span>
             <span class="time_count">{{ dataRange302 }}</span>
@@ -38,7 +38,7 @@
                 </div>
             </div>
         </div>
-        <div class="card_box">
+        <div class="card_box shadow">
             <div id="chart200" class="echart_box"></div>
             <span class="all_count">共{{ count200 }}抽</span>
             <span class="time_count">{{ dataRange200 }}</span>
@@ -58,8 +58,8 @@
                 </div>
             </div>
         </div>
-        <button class="upper_btn" @click="refresh"><i ref="refreshIcon" class="fa fa-refresh"
-                aria-hidden="true"></i></button>
+        <button class="upper_btn" @click="refresh">
+            <i ref="refreshIcon" class="iconfont icon-Loading" aria-hidden="true"></i></button>
     </div>
 </template>
 
@@ -99,7 +99,6 @@ var option1 = {
         orient: 'vertical',
         left: 'left',
         top: '50',
-        // color: '#000'
         textStyle: {
             color: '#000'
         }
@@ -395,8 +394,14 @@ var option3 = {
     ]
 }
 onMounted(async () => {
+    await appWindow.onThemeChanged(({ payload: theme }) => {
+        checkTheme(theme)
+        destoryCharts()
+        initCharts()
+        console.log('New theme: ' + theme);
+    })
     flag_loading.value = true
-    checkTheme()
+    checkTheme(await appWindow.theme())
     initData()
 })
 onBeforeUnmount(() => {
@@ -407,8 +412,13 @@ const getAvatarFile = (name) => {
     return new URL(`../assets/avatar/${name}.webp`, import.meta.url).href
 }
 //初始化系统主题信息
-async function checkTheme() {
-    var themeColor = await appWindow.theme() === 'dark' ? '#fff' : '#000'
+async function checkTheme(theme) {
+    var themeColor = theme === 'dark' ? '#fff' : '#000'
+    var themeBorder = theme === 'dark' ? 'rgb(33,37,43)' : 'rgb(245,245,245)'
+    console.log(`themeColor=${themeColor}`);
+    option1.series[0].itemStyle.borderColor = themeBorder
+    option2.series[0].itemStyle.borderColor = themeBorder
+    option3.series[0].itemStyle.borderColor = themeBorder
     option1.title.textStyle.color = themeColor
     option1.legend.textStyle.color = themeColor
     option1.series[0].label.color = themeColor
@@ -418,9 +428,6 @@ async function checkTheme() {
     option3.title.textStyle.color = themeColor
     option3.legend.textStyle.color = themeColor
     option3.series[0].label.color = themeColor
-    option1.series[0].itemStyle.borderColor = await appWindow.theme() === 'dark' ? 'rgb(33,37,43)' : 'rgb(245,245,245)'
-    option2.series[0].itemStyle.borderColor = await appWindow.theme() === 'dark' ? 'rgb(33,37,43)' : 'rgb(245,245,245)'
-    option3.series[0].itemStyle.borderColor = await appWindow.theme() === 'dark' ? 'rgb(33,37,43)' : 'rgb(245,245,245)'
 }
 //初始化图表
 function initCharts() {
@@ -750,11 +757,11 @@ const refresh = async () => {
 }
 
 .upper_btn:hover {
-    transform: rotate(90deg);
+    transform: rotate(-90deg);
 }
 
-.fa-refresh {
-    font-size: 32px;
+.icon-Loading {
+    font-size: 50px;
 }
 
 @media(prefers-color-scheme: Dark) {
