@@ -1,7 +1,12 @@
-# Tauri + Vue 3
+# Genshin Project
 
-This template should help get you started developing with Tauri + Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
++ 一个免费的原神小工具,进度缓慢.
 
-## Recommended IDE Setup
+## 1. Template Impl
+
++ Tauri -> [Build smaller, faster, and more secure desktop applications with a web frontend | Tauri Apps](https://tauri.app/)
++ Vue3 -> [Vue3 (vue3js.cn)](https://vue3js.cn/)
+
+## 2. Recommended IDE Setup
 
 - [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
