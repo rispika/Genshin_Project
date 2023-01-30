@@ -1,0 +1,39 @@
+import { createStore } from 'vuex'
+import { invoke } from '@tauri-apps/api';
+
+/**
+ * 创建仓库和导出
+ */
+export default createStore({
+    state: {
+        flagLoading: false,
+        loadingMargin: 0,
+        loadingMsg: '请稍等一会!',
+        UID: 'NONE'
+    },
+    actions: {
+        async updateUID() {
+            console.log(`开始尝试获取uid`);
+            const uids = await invoke('get_data_uid')
+            console.log(`当前uid为${uids}`);
+            if (Object.keys(uids).length !== 0) {
+                console.log(`存在uids`);
+                this.commit('setUID',uids[0])
+            }
+        }
+    },
+    mutations: {
+        setLoadingMargin(state, newMargin) {
+            state.loadingMargin = newMargin
+        },
+        setLoadingMsg(state, newMsg) {
+            state.loadingMsg = newMsg
+        },
+        setUID(state, newUID) {
+            state.UID = newUID
+        },
+        setFlagLoading(state, newFlag) {
+            state.flagLoading = newFlag
+        }
+    }
+})
