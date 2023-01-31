@@ -72,7 +72,6 @@ import { onMounted, onBeforeUnmount, ref, computed, watch } from 'vue'
 import { appWindow } from '@tauri-apps/api/window';
 //  按需引入 echarts
 import * as echarts from "echarts";
-const flag_loading = ref(false)
 const store = useStore()
 const count200 = ref(0), count301 = ref(0), count302 = ref(302)
 const dataRange200 = ref(null), dataRange301 = ref(null), dataRange302 = ref(null)
@@ -80,7 +79,6 @@ var dataCountList200
 var dataCountList301
 var dataCountList302
 var mychart1, mychart2, mychart3
-var sty = ['#ffa631', '#8d4bbb', '#44cef6']
 var option1 = {
     title: {
         text: '原神UP角色池',
@@ -103,7 +101,7 @@ var option1 = {
             color: '#000'
         }
     },
-    color: sty,
+    color: ['#ffa631', '#8d4bbb', '#44cef6'],
     series: [
         {
             name: '原神UP角色池',
@@ -400,6 +398,7 @@ onMounted(async () => {
     store.commit('setFlagLoading', true)
     checkTheme(await appWindow.theme())
     initData()
+    await setOptions()
     watch(theme, (newVal) => {
         checkTheme(newVal)
         destoryCharts()
@@ -556,9 +555,9 @@ async function setOptions() {
 //整合所有fetch请求
 async function request(url) {
     //   list1 = await fetch(url, 100);
-    const flag200 = await fetch(url, 200);
-    const flag301 = await fetch(url, 301);
-    const flag302 = await fetch(url, 302);
+    const flag200 = await fetch(url, 200)
+    const flag301 = await fetch(url, 301)
+    const flag302 = await fetch(url, 302)
     return flag200 || flag301 || flag302
 }
 //发出请求抓取卡池信息

@@ -3,10 +3,11 @@
     windows_subsystem = "windows"
 )]
 mod utils;
-use crate::utils::{get_gacha_url_impl, set_window_shadow};
 mod data;
+use crate::utils::{get_gacha_url_impl, set_window_shadow};
+use fs2::FileExt;
 use data::{Data, DataApp, DataCount};
-use std::{fs, sync::Mutex};
+use std::{fs::{self, File}, sync::Mutex, path::Path};
 use substring::Substring;
 use tauri::{
     CustomMenuItem, Manager, State, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
@@ -154,6 +155,14 @@ fn get_gacha_time(mut gacha_type: String, state: State<AppState>) -> Result<Stri
     Ok(time_range)
 }
 fn main() {
+    //
+    if !Path::exists(Path::new("process.lock")) {
+        File::create("process.lock").unwrap();
+    }
+    let lock = File::open("process.lock").unwrap();
+    println!("准备加锁!");
+    lock.lock_exclusive().unwrap();
+    //
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
     let hide = CustomMenuItem::new("hide".to_string(), "Hide");
     let tray_menu = SystemTrayMenu::new()

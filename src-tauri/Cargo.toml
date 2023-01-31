@@ -21,6 +21,7 @@ rusqlite = "0.28.0"
 regex = "1.7.1"
 substring = "1.4.5"
 opener = "0.5.2"
+fs2 = "0.4.3"
 [features]
 # by default Tauri runs in production mode
 # when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL
