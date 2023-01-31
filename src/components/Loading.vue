@@ -73,7 +73,7 @@ const poetry = ref([
 ])
 </script>
     
-<style scoped>
+<style lang="scss" scoped>
 *{
     color: #606060;
 }
@@ -171,7 +171,7 @@ span:nth-child(5) {
     }
 }
 
-@media (prefers-color-scheme: Dark) {
+body[data-theme=dark] {
     .loading {
         background-color: #8080804f;
     }

@@ -4,7 +4,7 @@
         <span class="label" data-tauri-drag-region>Genshin Project</span>
         <button @click="appWindow.minimize()" class="btn" style="background-color: #0c8918"></button>
         <button @click="appWindow.toggleMaximize()" class="btn" style="background: #e9bb1d"></button>
-        <button @click="appWindow.close()" class="btn" style="background: #c83c23"></button>
+        <button @click="appWindow.hide()" class="btn" style="background: #c83c23"></button>
     </div>
 </template>
 
@@ -13,7 +13,7 @@ import { appWindow } from '@tauri-apps/api/window'
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 #header {
     background-color: rgb(232,232,232);
     height: 35px;
@@ -29,7 +29,7 @@ import { appWindow } from '@tauri-apps/api/window'
     box-sizing: border-box;
     z-index: 9999;
 }
-@media(prefers-color-scheme: Dark) {
+body[data-theme=dark] {
     #header {
         background-color: rgb(33,37,43);
     }

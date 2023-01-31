@@ -6,6 +6,7 @@ import { invoke } from '@tauri-apps/api';
  */
 export default createStore({
     state: {
+        theme: "light",
         flagLoading: false,
         loadingMargin: 0,
         loadingMsg: '请稍等一会!',
@@ -24,6 +25,9 @@ export default createStore({
         }
     },
     mutations: {
+        setTheme(state, newTheme) {
+            state.theme = newTheme
+        },
         setLoadingMargin(state, newMargin) {
             state.loadingMargin = newMargin
         },

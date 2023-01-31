@@ -4,22 +4,26 @@
     <div class="main">
       <Nav></Nav>
       <Transition>
-        <router-view class="view" v-slot="{ Component }">
-          <KeepAlive include="Card">
-            <component class="view" :is="Component" />
-          </KeepAlive>
-        </router-view>
+        <router-view class="view"></router-view>
       </Transition>
     </div>
     <span class="uid">UID:{{ store.state.UID }}</span>
-    <button class="theme_btn" @click="changeTheme">
-      <Transition name="sun">
-        <i v-if="theme_bool" class="iconfont icon-lieri theme_item"></i>
-      </Transition>
-      <Transition name="moon">
-        <i v-if="!theme_bool" class="iconfont icon-yejing theme_item"></i>
-      </Transition>
-    </button>
+    <div class="menu" :class="{ 'menu-show': flagMenu }">
+      <button @click="flagMenu = !flagMenu"><span><i class="iconfont icon-liebiao"></i></span>菜单</button>
+      <button><span><i class="iconfont icon-guanliyuansousuo"></i></span>UID</button>
+      <button @click="changeTheme">
+        <span>
+          <Transition name="theme">
+            <i v-if="store.state.theme === 'light'" class="iconfont icon-lieri"></i>
+          </Transition>
+          <Transition name="theme">
+            <i v-if="store.state.theme === 'dark'" class="iconfont icon-yejing"></i>
+          </Transition>
+        </span>
+        主题
+      </button>
+
+    </div>
     <Loading></Loading>
     <Notice @restart="initProject"></Notice>
   </div>
@@ -30,23 +34,40 @@ import Notice from './components/Notice-init.vue'
 import Loading from './components/Loading.vue'
 import Header from './components/Header.vue';
 import Nav from './components/Nav.vue';
-import { currentMonitor } from '@tauri-apps/api/window';
-import { onMounted, ref } from 'vue';
+import { onMounted, watch, computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import { invoke } from '@tauri-apps/api';
 import { appWindow } from '@tauri-apps/api/window';
+const flagMenu = ref(false)
 const store = useStore()
-const theme_bool = ref(null);
-const monitor = await currentMonitor();
-console.log(`monitor=${monitor}`);
 onMounted(async () => {
+  initTheme()
   store.commit('setFlagLoading', true)
   initProject()
-  theme_bool.value = await appWindow.theme() === 'light'
 })
+const initTheme = async () => {
+  store.commit('setTheme', await appWindow.theme())
+  if (store.state.theme === 'dark') {
+    const body = document.querySelector('body')
+    body.setAttribute('data-theme', 'dark')
+  }
+}
+const theme = computed(() => {
+  return store.state.theme
+})
+watch(theme, (newVal) => {
+  console.log(`切换主题:${newVal}`);
+  const body = document.querySelector('body')
+  body.setAttribute('data-theme', newVal)
+
+}, { immediate: true, deep: true })
+//修改主题
 const changeTheme = () => {
-  theme_bool.value = !theme_bool.value
-  
+  if (store.state.theme === 'dark') {
+    store.commit('setTheme', 'light')
+  } else {
+    store.commit('setTheme', 'dark')
+  }
 }
 async function initProject() {
   store.dispatch('updateUID')
@@ -62,7 +83,7 @@ async function initProject() {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 #home {
   min-height: 100%;
   box-sizing: border-box;
@@ -70,6 +91,8 @@ async function initProject() {
   color: black;
   padding-top: 35px;
 }
+
+
 
 .main {
   height: calc(100vh - 35px);
@@ -88,33 +111,83 @@ async function initProject() {
   flex: 1;
 }
 
-.theme_btn {
+//菜单
+.menu-show {
+  transform: translate(0px) !important;
+}
+
+.menu {
   position: fixed;
-  right: 5%;
+  z-index: 11;
+  right: 0%;
   top: 10%;
   height: 80px;
-  width: 80px;
-  border-radius: 50%;
-  backdrop-filter: blur(5px);
+  width: 240px;
+  border-radius: 80px 0 0 80px;
   transition: all .5s ease;
+  transform: translate(160px);
+  backdrop-filter: blur(5px);
+  background-color: rgba(255, 255, 255, 0.3);
   display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
+
+  button {
+    position: relative;
+    height: 80px;
+    width: 80px;
+    transition: all .5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-direction: column;
+    
+    span {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      i {
+        position: absolute;
+        font-size: 30px;
+      }
+    }
+
+  }
 }
 
-.theme_item {
-  position: absolute;
-  font-size: 35px;
-}
-
+// 菜单结束
 .v-enter-active,
-.v-leave-active {
+.v-leave-active,
+.theme-enter-active,
+.theme-leave-active {
   transition: all .5s ease;
 }
 
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
+}
+
+.theme-enter-from {
+  opacity: 0;
+  transform: translateY(50px);
+}
+
+.theme-leave-to {
+  opacity: 0;
+  transform: translateY(-50px);
+}
+
+@media screen and (min-width: 1600px) {
+  .uid {
+    font-size: 36px;
+  }
+}
+
+body[data-theme=dark] {
+  .menu {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
 }
 </style>

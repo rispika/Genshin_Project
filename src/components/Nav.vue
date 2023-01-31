@@ -50,7 +50,7 @@ const clickArrow = () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .nav {
     position: relative;;
     min-height: 100%;
@@ -143,7 +143,7 @@ div .long_nav {
     transform: scale(0);
 }
 
-@media(prefers-color-scheme: Dark) {
+body[data-theme=dark] {
     .nav {
         background-color: rgb(33, 37, 43);
     }

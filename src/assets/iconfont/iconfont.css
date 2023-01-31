@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3872907 */
-  src: url('iconfont.woff2?t=1675065418505') format('woff2'),
-       url('iconfont.woff?t=1675065418505') format('woff'),
-       url('iconfont.ttf?t=1675065418505') format('truetype');
+  src: url('iconfont.woff2?t=1675140106275') format('woff2'),
+       url('iconfont.woff?t=1675140106275') format('woff'),
+       url('iconfont.ttf?t=1675140106275') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,18 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-Game:before {
+  content: "\e613";
+}
+
+.icon-liebiao:before {
+  content: "\e603";
+}
+
+.icon-guanliyuansousuo:before {
+  content: "\eacc";
 }
 
 .icon-xiangxia:before {

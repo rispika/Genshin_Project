@@ -59,7 +59,7 @@ const position = async () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .notice {
     position: fixed;
     z-index: 999;
@@ -111,7 +111,7 @@ const position = async () => {
     background-color: rgb(42, 42, 42);
 }
 
-@media (prefers-color-scheme: Dark) {
+body[data-theme=dark] {
     .notice {
         background-color: rgb(64, 69, 80);
     }

@@ -8,10 +8,21 @@ mod data;
 use data::{Data, DataApp, DataCount};
 use std::{fs, sync::Mutex};
 use substring::Substring;
-use tauri::State;
+use tauri::{
+    CustomMenuItem, Manager, State, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
+};
 use utils::{read_genshin_path, save_genshin_path_impl};
 struct AppState {
     app: Mutex<DataApp>,
+}
+
+//启动游戏
+#[tauri::command]
+async fn start_genshin() -> Result<(), String> {
+    let game_path_pre = read_genshin_path()?;
+    let game_path = game_path_pre + "/YuanShen.exe";
+    opener::open(game_path).map_err(|err| err.to_string())?;
+    Ok(())
 }
 
 //保存原神路径
@@ -23,24 +34,24 @@ async fn save_genshin_path() -> Result<(), String> {
 
 #[tauri::command]
 //检查原神路径
-async fn check_genshin_path() -> Result<(), String> {
+async fn check_genshin_path() -> Result<String, String> {
     let genshin_path = read_genshin_path()?;
-    let paths = fs::read_dir(genshin_path).map_err(|err| err.to_string())?;
+    let paths = fs::read_dir(genshin_path.clone()).map_err(|err| err.to_string())?;
     let mut flag = true;
     for path in paths {
         let g_path = path.unwrap().path().to_str().unwrap().to_string();
-        println!("{}",g_path);
-        if g_path.contains("YuanShen.exe")
-        {
+        println!("{}", g_path);
+        if g_path.contains("YuanShen.exe") {
             flag = false;
             break;
-        }   
+        }
     }
     if flag {
         //没找到
-        return Err("没有获取正确的原神路径!".to_string())
+        return Err("没有获取正确的原神路径!".to_string());
     }
-    Ok(())
+    let game_path = genshin_path + "/YuanShen.exe";
+    Ok(game_path)
 }
 
 //获取卡池地址
@@ -142,15 +153,58 @@ fn get_gacha_time(mut gacha_type: String, state: State<AppState>) -> Result<Stri
     let time_range: String = start_time.to_string() + " TO " + end_time;
     Ok(time_range)
 }
-
 fn main() {
+    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
+    let hide = CustomMenuItem::new("hide".to_string(), "Hide");
+    let tray_menu = SystemTrayMenu::new()
+        .add_item(hide)
+        .add_native_item(SystemTrayMenuItem::Separator)
+        .add_item(quit);
+
     let app = DataApp::new().unwrap();
     tauri::Builder::default()
         .setup(|app| {
             set_window_shadow(app);
             Ok(())
         })
+        .system_tray(SystemTray::new().with_menu(tray_menu))
         // .plugin(tauri_plugin_sql::Builder::default().build())
+        .on_system_tray_event(|app, event| match event {
+            SystemTrayEvent::LeftClick {
+                position: _,
+                size: _,
+                ..
+            } => {
+                println!("system tray received a left click");
+                let window = app.get_window("genshin-project").unwrap();
+                window.show().unwrap();
+            }
+            SystemTrayEvent::RightClick {
+                position: _,
+                size: _,
+                ..
+            } => {
+                println!("system tray received a right click");
+            }
+            SystemTrayEvent::DoubleClick {
+                position: _,
+                size: _,
+                ..
+            } => {
+                println!("system tray received a double click");
+            }
+            SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+                "quit" => {
+                    std::process::exit(0);
+                }
+                "hide" => {
+                    let window = app.get_window("genshin-project").unwrap();
+                    window.hide().unwrap();
+                }
+                _ => {}
+            },
+            _ => {}
+        })
         .invoke_handler(tauri::generate_handler![
             get_data_list,
             add_data_list,
@@ -161,7 +215,8 @@ fn main() {
             get_gacha_url,
             get_gacha_time,
             save_genshin_path,
-            check_genshin_path
+            check_genshin_path,
+            start_genshin
         ])
         .manage(AppState {
             app: Mutex::from(app),

@@ -80,7 +80,8 @@ pub fn get_gacha_url_impl(genshin_path: String) -> Result<String, String> {
         return Ok("".to_string());
     }
     let log_path = genshin_path + "/YuanShen_Data/webCaches/Cache/Cache_Data/data_2";
-    let mut input = File::open(log_path).expect("file open wrong");
+    println!("log_path: {}", log_path);
+    let mut input = File::open(log_path).map_err(|err| err.to_string())?;
     // 转换成utf8
     let mut buf = vec![];
     input.read_to_end(&mut buf).map_err(|err| err.to_string())?;

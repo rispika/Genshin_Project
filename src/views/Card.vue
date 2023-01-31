@@ -68,7 +68,7 @@ import { useStore } from 'vuex';
 import { http } from '@tauri-apps/api'
 import { message } from '@tauri-apps/api/dialog';
 import { invoke } from '@tauri-apps/api';
-import { onMounted, onBeforeUnmount, ref } from 'vue'
+import { onMounted, onBeforeUnmount, ref, computed, watch } from 'vue'
 import { appWindow } from '@tauri-apps/api/window';
 //  按需引入 echarts
 import * as echarts from "echarts";
@@ -393,20 +393,25 @@ var option3 = {
         }
     ]
 }
+const theme = computed(() => {
+    return store.state.theme
+})
 onMounted(async () => {
-    await appWindow.onThemeChanged(({ payload: theme }) => {
-        checkTheme(theme)
-        destoryCharts()
-        initCharts()
-        console.log('New theme: ' + theme);
-    })
-    flag_loading.value = true
+    store.commit('setFlagLoading', true)
     checkTheme(await appWindow.theme())
     initData()
+    watch(theme, (newVal) => {
+        checkTheme(newVal)
+        destoryCharts()
+        initCharts()
+        store.commit('setFlagLoading', false)
+    }, { immediate: true, deep: true })
 })
 onBeforeUnmount(() => {
     destoryCharts()
 })
+
+
 //获取图表信息->打包
 const getAvatarFile = (name) => {
     return new URL(`../assets/avatar/${name}.webp`, import.meta.url).href
@@ -443,9 +448,9 @@ function initCharts() {
 }
 //摧毁图表
 function destoryCharts() {
-    if (mychart1) mychart1.dispose()
-    if (mychart2) mychart2.dispose()
-    if (mychart3) mychart3.dispose()
+    if (mychart1!==undefined&&mychart1!==null) mychart1.dispose()
+    if (mychart2!==undefined&&mychart2!==null) mychart2.dispose()
+    if (mychart3!==undefined&&mychart3!==null) mychart3.dispose()
 }
 //图标大小自适应
 window.addEventListener('resize', () => {
@@ -464,11 +469,11 @@ async function initData() {
             const url = await invoke('get_gacha_url')
             console.log(`卡池url_pre=${url}`)
             if (!url) {
-                await message('请登录原神,打开抽卡记录后,再次打开本软件重试!')
+                await message('请登录原神,打开抽卡记录后,再次打开本软件重试!-noUrl')
                 await appWindow.close()
             }
             if (await request(url)) {
-                await message('请登录原神,打开抽卡记录后,再次打开本软件重试!')
+                await message('请登录原神,打开抽卡记录后,再次打开本软件重试!-no')
                 await appWindow.close()
             } else {
                 if (store.state.UID === 'NONE') {
@@ -483,8 +488,6 @@ async function initData() {
     }
 
     await setOptions()
-    initCharts()
-    flag_loading.value = false
 }
 //设置渲染的数据!
 async function setOptions() {
@@ -544,7 +547,7 @@ async function setOptions() {
         dataRange301.value = await invoke('get_gacha_time', { gachaType: '301' })
         dataRange302.value = await invoke('get_gacha_time', { gachaType: '302' })
     } catch (error) {
-        flag_loading.value = true
+        store.commit('setFlagLoading', true)
         store.commit('setLoadingMsg', `发生故障,重新读取中`)
         await refresh()
     }
@@ -587,11 +590,12 @@ async function fetch(url, type) {
     }
     var flag_history = false
     while (true) {
-        const dataUrl = 'https://hk4e-api.mihoyo.com/event/gacha_info/api/getGachaLog?' + url + '&gacha_type=' + type + '&page=' + page + '&size=20&end_id=' + end_id
+        const dataUrl = url + '&gacha_type=' + type + '&page=' + page + '&size=20&end_id=' + end_id
         console.log(`dataUrl=${dataUrl}`);
         const res = await http.fetch(dataUrl, httpConfig)
         if (res.ok !== true) console.log(`error!code=${res.status}`);
         if (res.data.data === null) {
+            console.log("权限过期");
             if (page === 1) flag_history = true
             break
         }
@@ -608,7 +612,7 @@ async function fetch(url, type) {
 }
 //刷新操作!
 const refresh = async () => {
-    flag_loading.value = true
+    store.commit('setFlagLoading', true)
     destoryCharts()
     console.log(`开始获取卡池url`);
     try {
@@ -630,11 +634,12 @@ const refresh = async () => {
     }
     await setOptions()
     initCharts()
-    flag_loading.value = false
+    store.commit('setFlagLoading', false)
+
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .card {
     position: relative;
     box-sizing: border-box;
@@ -764,7 +769,7 @@ const refresh = async () => {
     font-size: 50px;
 }
 
-@media(prefers-color-scheme: Dark) {
+body[data-theme=dark] {
     .card_box {
         background-color: rgb(33, 37, 43);
         box-shadow: 1px 0.5px 1px 1px rgba(0, 0, 0, 0.205);

