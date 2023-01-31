@@ -9,8 +9,8 @@
     </div>
     <span class="uid">UID:{{ store.state.UID }}</span>
     <div class="menu" :class="{ 'menu-show': flagMenu }">
-      <button @click="flagMenu = !flagMenu"><span><i class="iconfont icon-liebiao"></i></span>菜单</button>
-      <button><span><i class="iconfont icon-guanliyuansousuo"></i></span>UID</button>
+      <button @click="flagMenu = !flagMenu;flagUIDManager = false"><span><i class="iconfont icon-liebiao"></i></span>菜单</button>
+      <button @click="flagUIDManager = !flagUIDManager"><span><i class="iconfont icon-guanliyuansousuo"></i></span>UID</button>
       <button @click="changeTheme">
         <span>
           <Transition name="theme">
@@ -22,14 +22,17 @@
         </span>
         主题
       </button>
-
     </div>
+    <Transition>
+      <UIDManager v-if="flagUIDManager"></UIDManager>
+    </Transition>
     <Loading></Loading>
     <Notice @restart="initProject"></Notice>
   </div>
 </template>
 
 <script setup>
+import UIDManager from './components/UIDManager.vue'
 import Notice from './components/Notice-init.vue'
 import Loading from './components/Loading.vue'
 import Header from './components/Header.vue';
@@ -39,6 +42,7 @@ import { useStore } from 'vuex';
 import { invoke } from '@tauri-apps/api';
 import { appWindow } from '@tauri-apps/api/window';
 const flagMenu = ref(false)
+const flagUIDManager = ref(false)
 const store = useStore()
 onMounted(async () => {
   initTheme()
@@ -120,7 +124,7 @@ async function initProject() {
   position: fixed;
   z-index: 11;
   right: 0%;
-  top: 10%;
+  top: 80px;
   height: 80px;
   width: 240px;
   border-radius: 80px 0 0 80px;

@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import { app, invoke } from '@tauri-apps/api';
+import { invoke } from '@tauri-apps/api';
 import { appWindow } from '@tauri-apps/api/window';
 const start_game = async () => {
     console.log(`游戏启动!`)

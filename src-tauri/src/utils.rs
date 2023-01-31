@@ -87,7 +87,7 @@ pub fn get_gacha_url_impl(genshin_path: String) -> Result<String, String> {
     input.read_to_end(&mut buf).map_err(|err| err.to_string())?;
     let contents = String::from_utf8_lossy(&buf);
     // 正则
-    let re2 = Regex::new(r#"1/0/(https://hk4e-api.mihoyo.com/.+?)&gacha_type"#)
+    let re2 = Regex::new(r#"1/0/(https://hk4e-api.mihoyo.com/.+?&game_biz=hk4e_cn)"#)
         .map_err(|err| err.to_string())?;
     let mut url_pre = String::new();
     for cap in re2.captures_iter(&contents) {

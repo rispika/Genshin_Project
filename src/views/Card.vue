@@ -4,7 +4,7 @@
             <div id="chart301" class="echart_box"></div>
             <span class="all_count">共{{ count301 }}抽</span>
             <span class="time_count">{{ dataRange301 }}</span>
-            <div class="msg_box">
+            <div class="msg_box shadow">
                 <div v-for="(v, index) in dataCountList301" :key="index">
                     <div class="img_box">
                         <img :src="getAvatarFile(v.name)" :alt="v.name">
@@ -394,6 +394,9 @@ var option3 = {
 const theme = computed(() => {
     return store.state.theme
 })
+const UID = computed(()=>{
+    return store.state.UID
+})
 onMounted(async () => {
     store.commit('setFlagLoading', true)
     checkTheme(await appWindow.theme())
@@ -405,6 +408,11 @@ onMounted(async () => {
         initCharts()
         store.commit('setFlagLoading', false)
     }, { immediate: true, deep: true })
+    watch(UID, async(newVal) => {
+        await setOptions()
+        destoryCharts()
+        initCharts()
+    },{ immediate: true, deep: true })
 })
 onBeforeUnmount(() => {
     destoryCharts()
@@ -462,8 +470,9 @@ async function initData() {
     console.log(`开始执行initData`);
     console.log(`开始查询索引`);
     try {
-        const query = await invoke('get_data_uid')
-        if (query.length === 0) {
+        const uids = await invoke('get_data_uid')
+        console.log(`uids=${uids}`);
+        if (uids.length === 0) {
             console.log(`开始获取卡池url`);
             const url = await invoke('get_gacha_url')
             console.log(`卡池url_pre=${url}`)
@@ -472,7 +481,7 @@ async function initData() {
                 await appWindow.close()
             }
             if (await request(url)) {
-                await message('请登录原神,打开抽卡记录后,再次打开本软件重试!-no')
+                await message('请登录原神,打开抽卡记录后,再次打开本软件重试!-noResp')
                 await appWindow.close()
             } else {
                 if (store.state.UID === 'NONE') {
@@ -490,61 +499,71 @@ async function initData() {
 }
 //设置渲染的数据!
 async function setOptions() {
+    console.log(`开始渲染数据!`);
     try {
         //1.数据图表
         option1.series[0].data[0].value = await invoke('get_count', {
             gachaType: '301',
-            rankType: '5'
+            rankType: '5',
+            uid: store.state.UID
         })
         option1.series[0].data[1].value = await invoke('get_count', {
             gachaType: '301',
-            rankType: '4'
+            rankType: '4',
+            uid: store.state.UID
         })
         option1.series[0].data[2].value = await invoke('get_count', {
             gachaType: '301',
-            rankType: '3'
+            rankType: '3',
+            uid: store.state.UID
         })
         count301.value = option1.series[0].data[0].value + option1.series[0].data[1].value + option1.series[0].data[2].value
         //
         option2.series[0].data[0].value = await invoke('get_count', {
             gachaType: '302',
-            rankType: '5'
+            rankType: '5',
+            uid: store.state.UID
         })
         option2.series[0].data[1].value = await invoke('get_count', {
             gachaType: '302',
-            rankType: '4'
+            rankType: '4',
+            uid: store.state.UID
         })
         option2.series[0].data[2].value = await invoke('get_count', {
             gachaType: '302',
-            rankType: '3'
+            rankType: '3',
+            uid: store.state.UID
         })
         count302.value = option2.series[0].data[0].value + option2.series[0].data[1].value + option2.series[0].data[2].value
         //
         option3.series[0].data[0].value = await invoke('get_count', {
             gachaType: '200',
-            rankType: '5'
+            rankType: '5',
+            uid: store.state.UID
         })
         option3.series[0].data[1].value = await invoke('get_count', {
             gachaType: '200',
-            rankType: '4'
+            rankType: '4',
+            uid: store.state.UID
         })
         option3.series[0].data[2].value = await invoke('get_count', {
             gachaType: '200',
-            rankType: '3'
+            rankType: '3',
+            uid: store.state.UID
         })
         count200.value = option3.series[0].data[0].value + option3.series[0].data[1].value + option3.series[0].data[2].value
         //2.下部5星数据
         store.commit('setLoadingMsg', '马上了!')
-        dataCountList200 = await invoke('get_count_rank_list', { gachaType: '200' })
-        dataCountList301 = await invoke('get_count_rank_list', { gachaType: '301' })
-        dataCountList302 = await invoke('get_count_rank_list', { gachaType: '302' })
+        dataCountList200 = await invoke('get_count_rank_list', { gachaType: '200', uid: store.state.UID })
+        dataCountList301 = await invoke('get_count_rank_list', { gachaType: '301', uid: store.state.UID })
+        dataCountList302 = await invoke('get_count_rank_list', { gachaType: '302', uid: store.state.UID })
         dataCountList200 = dataCountList200.reverse()
         dataCountList301 = dataCountList301.reverse()
         dataCountList302 = dataCountList302.reverse()
         //3.日期数据
-        dataRange200.value = await invoke('get_gacha_time', { gachaType: '200' })
-        dataRange301.value = await invoke('get_gacha_time', { gachaType: '301' })
-        dataRange302.value = await invoke('get_gacha_time', { gachaType: '302' })
+        dataRange200.value = await invoke('get_gacha_time', { gachaType: '200', uid: store.state.UID })
+        dataRange301.value = await invoke('get_gacha_time', { gachaType: '301', uid: store.state.UID })
+        dataRange302.value = await invoke('get_gacha_time', { gachaType: '302', uid: store.state.UID })
     } catch (error) {
         store.commit('setFlagLoading', true)
         store.commit('setLoadingMsg', `发生故障,重新读取中`)
@@ -618,10 +637,10 @@ const refresh = async () => {
         const url = await invoke('get_gacha_url')
         console.log(`卡池url_pre=${url}`)
         if (!url) {
-            await message('请登录原神,打开抽卡记录后,再次刷新!')
+            await message('请登录原神,打开抽卡记录后,再次刷新:无url')
         }
         if (await request(url)) {
-            await message('请登录原神,打开抽卡记录后,再次刷新!')
+            await message('请登录原神,打开抽卡记录后,再次刷新:请求为空')
         }
         if (store.state.UID === 'NONE') {
             store.dispatch('updateUID')

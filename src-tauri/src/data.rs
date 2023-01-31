@@ -92,10 +92,10 @@ impl DataApp {
         Ok(data_list)
     }
 
-    pub fn get_data_gacha(&self, gacha_type: &String) -> Result<Vec<Data>,String> {
+    pub fn get_data_gacha(&self, gacha_type: &String, uid: &String) -> Result<Vec<Data>,String> {
         let sql = format!(
-            "SELECT * FROM Data WHERE GACHA_TYPE = {} ORDER BY id",
-            &gacha_type
+            "SELECT * FROM Data WHERE (GACHA_TYPE = {}) and uid = {} ORDER BY id",
+            &gacha_type, &uid
         );
         let mut stmt = self.conn.prepare(&sql).map_err(|err| err.to_string())?;
         let data_iter = stmt.query_map([], |row| {
@@ -171,12 +171,12 @@ impl DataApp {
         Ok(())
     }
 
-    pub fn get_count(&self, gacha_type: &String, rank_type: &String) -> Result<i32,String> {
+    pub fn get_count(&self, gacha_type: &String, rank_type: &String, uid: &String) -> Result<i32,String> {
         let sql = format!(
             "SELECT COUNT(*) FROM Data WHERE 
             gacha_type = {} and 
-            rank_type = {}",
-            gacha_type, rank_type
+            rank_type = {} and uid = {}",
+            gacha_type, rank_type, uid
         );
         let mut stmt = self.conn.prepare(&sql[..]).map_err(|err| err.to_string())?;
         let count = stmt.query_row((), |row| row.get(0)).map_err(|err| err.to_string())?;

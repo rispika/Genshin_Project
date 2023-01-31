@@ -7,7 +7,7 @@ mod data;
 use crate::utils::{get_gacha_url_impl, set_window_shadow};
 use fs2::FileExt;
 use data::{Data, DataApp, DataCount};
-use std::{fs::{self, File}, sync::Mutex, path::Path};
+use std::{fs::{self, File}, sync::Mutex, path::Path, io::Read};
 use substring::Substring;
 use tauri::{
     CustomMenuItem, Manager, State, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
@@ -85,11 +85,11 @@ fn add_data_list(data_list: Vec<Data>, state: State<AppState>) -> Result<(), Str
 }
 
 #[tauri::command(async)]
-fn get_count(gacha_type: String, rank_type: String, state: State<AppState>) -> Result<i32, String> {
+fn get_count(gacha_type: String, rank_type: String,uid: String, state: State<AppState>) -> Result<i32, String> {
     let app = state.app.lock().unwrap();
-    let mut res = app.get_count(&gacha_type, &rank_type)?;
+    let mut res = app.get_count(&gacha_type, &rank_type, &uid)?;
     if gacha_type == "301".to_string() {
-        res += app.get_count(&"400".to_string(), &rank_type)?;
+        res += app.get_count(&"400".to_string(), &rank_type, &uid)?;
     }
     Ok(res)
 }
@@ -104,6 +104,7 @@ fn drop_data(state: State<AppState>) -> Result<(), String> {
 #[tauri::command(async)]
 fn get_count_rank_list(
     mut gacha_type: String,
+    uid: String,
     state: State<AppState>,
 ) -> Result<Vec<DataCount>, String> {
     let app = state.app.lock().unwrap();
@@ -111,7 +112,7 @@ fn get_count_rank_list(
     if gacha_type == String::from("301") {
         gacha_type = "301 or GACHA_TYPE = 400".to_string();
     }
-    let res = app.get_data_gacha(&gacha_type)?;
+    let res = app.get_data_gacha(&gacha_type, &uid)?;
     let mut count: i32 = 0;
     let mut data_list: Vec<DataCount> = Vec::new();
     for data in res.iter() {
@@ -131,12 +132,12 @@ fn get_count_rank_list(
 
 // 获取卡池时间范围
 #[tauri::command(async)]
-fn get_gacha_time(mut gacha_type: String, state: State<AppState>) -> Result<String, String> {
+fn get_gacha_time(mut gacha_type: String, uid: String, state: State<AppState>) -> Result<String, String> {
     let app = state.app.lock().unwrap();
     if gacha_type == String::from("301") {
         gacha_type = "301 or GACHA_TYPE = 400".to_string();
     }
-    let query = app.get_data_gacha(&gacha_type)?;
+    let query = app.get_data_gacha(&gacha_type, &uid)?;
     let mut start_time = "";
     let mut end_time = "";
     let mut count = true;
@@ -159,7 +160,14 @@ fn main() {
     if !Path::exists(Path::new("process.lock")) {
         File::create("process.lock").unwrap();
     }
-    let lock = File::open("process.lock").unwrap();
+    let mut lock = File::open("process.lock").unwrap();
+    let mut str = "".to_string();
+    match lock.read_to_string(&mut str) {
+        Ok(_) => (),
+        Err(_) => {
+            std::process::exit(0);
+        }
+    };
     println!("准备加锁!");
     lock.lock_exclusive().unwrap();
     //
