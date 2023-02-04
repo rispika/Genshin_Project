@@ -11,11 +11,20 @@
 
 <script setup>
 import { invoke } from '@tauri-apps/api';
+import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/api/notification';
 import { appWindow } from '@tauri-apps/api/window';
 const start_game = async () => {
     console.log(`游戏启动!`)
     try {
         await invoke('start_genshin')
+        let permissionGranted = await isPermissionGranted();
+        if (!permissionGranted) {
+            const permission = await requestPermission();
+            permissionGranted = permission === 'granted';
+        }
+        if (permissionGranted) {
+            sendNotification({ title: 'Genshin Project', body: '游戏启动~原神工具箱已自动隐藏到托盘!' });
+        }
         await appWindow.hide()
     } catch (error) {
         alert(`打开游戏失败,${error}`)

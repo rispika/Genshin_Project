@@ -5,6 +5,7 @@ import Home from '../views/Home.vue'
 import Card from '../views/Card.vue'
 import t1 from '../views/t1.vue'
 import t2 from '../views/t2.vue'
+import Map from '../views/Map.vue'
 const routerHistory = createWebHistory()
 
 const router = createRouter({
@@ -26,6 +27,10 @@ const router = createRouter({
         {
             path: '/t2',
             component: t2
+        },
+        {
+            path: '/map',
+            component: Map
         }
     ]
 })

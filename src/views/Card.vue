@@ -23,7 +23,7 @@
             <span class="all_count">共{{ count302 }}抽</span>
             <span class="time_count">{{ dataRange302 }}</span>
 
-            <div class="msg_box">
+            <div class="msg_box shadow">
                 <div v-for="(v, index) in dataCountList302" :key="index">
                     <div class="img_box">
                         <img :src="getAvatarFile(v.name)" :alt="v.name">
@@ -43,7 +43,7 @@
             <span class="all_count">共{{ count200 }}抽</span>
             <span class="time_count">{{ dataRange200 }}</span>
 
-            <div class="msg_box">
+            <div class="msg_box shadow">
                 <div v-for="(v, index) in dataCountList200" :key="index">
                     <div class="img_box">
                         <img :src="getAvatarFile(v.name)" :alt="v.name">

@@ -8,7 +8,7 @@
       </Transition>
     </div>
     <span class="uid">UID:{{ store.state.UID }}</span>
-    <div class="menu" :class="{ 'menu-show': flagMenu }">
+    <div v-show="store.state.flagMenu" class="menu" :class="{ 'menu-show': flagMenu }">
       <button @click="flagMenu = !flagMenu;flagUIDManager = false"><span><i class="iconfont icon-liebiao"></i></span>菜单</button>
       <button @click="flagUIDManager = !flagUIDManager"><span><i class="iconfont icon-guanliyuansousuo"></i></span>UID</button>
       <button @click="changeTheme">

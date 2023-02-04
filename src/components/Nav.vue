@@ -28,6 +28,12 @@
                     <span v-show="flag_arrow">嗨害害!</span>
                 </Transition>
             </router-link>
+            <router-link tag="button" class="link" to="/map">
+                <i class="iconfont icon-ditu" aria-hidden="true"></i>
+                <Transition>
+                    <span v-show="flag_arrow">提瓦特地图</span>
+                </Transition>
+            </router-link>
             <div class="split"></div>
         </div>
 
@@ -57,7 +63,7 @@ const clickArrow = () => {
     width: 40px;
     height: 100%;
     background-color: rgb(245, 245, 245);
-    transition: all .5s ease;
+    transition: width .5s ease;
     will-change: width;
     z-index: 10;
 }
@@ -70,7 +76,7 @@ const clickArrow = () => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: all .5s ease;
+    transition: width .5s ease;
     will-change: width;
     z-index: 10;
 }

@@ -1,7 +1,7 @@
 <template>
     <div class="box">
         <img class="shadow" src="../assets/img/babala.jpg" alt="囊哒哟!">
-        <h1>诶嘿!还没做捏!诶嘿!</h1>
+        <h1>来个大佬带带我!</h1>
     </div>
 </template>
 

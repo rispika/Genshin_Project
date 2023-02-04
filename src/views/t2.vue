@@ -1,7 +1,7 @@
 <template>
     <div class="box">
         <img class="shadow" src="../assets/img/venti.jpg" alt="囊哒哟!">
-        <h1>诶嘿!还没做捏!诶嘿!</h1>
+        <h1>米哈游api加密了o(╥﹏╥)o</h1>
     </div>
 </template>
 

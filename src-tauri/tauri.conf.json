@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "genshin-project",
-    "version": "0.0.2"
+    "version": "0.0.4"
   },
   "tauri": {
     "systemTray": {
@@ -36,7 +36,9 @@
         "request": true,
         "scope": 
           ["http://**","https://**"]
-        
+      },
+      "notification": {
+        "all": true
       }
 
     },

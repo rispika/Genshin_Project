@@ -7,6 +7,7 @@ import { invoke } from '@tauri-apps/api';
 export default createStore({
     state: {
         theme: "light",
+        flagMenu: true,
         flagLoading: false,
         loadingMargin: 0,
         loadingMsg: '请稍等一会!',
@@ -42,6 +43,9 @@ export default createStore({
         },
         setNoticeInitFlag(state, newFlag) {
             state.noticeInitFlag = newFlag
+        },
+        setFlagMenu(state, newFlag) {
+            state.flagMenu = newFlag
         }
     }
 })
